@@ -5,6 +5,7 @@
 #-----------------------------------------------------------------------------------
 # Install command:
 vs_SSMS.exe --quiet --norestart --wait
+
 # Uninstall command:
 "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\setup.exe" uninstall --installPath "%ProgramFiles%\Microsoft SQL Server Management Studio 21\Release" --quiet && timeout /t 300
 
