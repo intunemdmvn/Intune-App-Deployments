@@ -1,21 +1,29 @@
-$path = 'C:\IntuneScript'
-if (-not (Test-Path -Path 'C:\IntuneScript')) {
-    New-Item -Path $path -ItemType Directory
+# Get the installed version of WinRAR to the $installedVersion variable
+$regPaths = @(
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+    "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+)
+
+foreach ($regPath in $regPaths) {
+    $apps = Get-ChildItem $regPath -ErrorAction SilentlyContinue
+    foreach ($app in $apps) {
+        $props = Get-ItemProperty $app.PSPath
+        if ($props.DisplayName -like "*WinRAR*") {
+            $installedVersion = $($props.DisplayVersion)
+        }
+    }
 }
 
-Copy-Item -Path .\winrar-update.ps1 -Destination "C:\IntuneScript\"
+$latestVersion = '7.12.0'
 
-# $trigger = New-ScheduledTaskTrigger -Weekly -At 3AM -DaysOfWeek Sunday -WeeksInterval 1
-$trigger = New-ScheduledTaskTrigger -Daily -At 12AM
-$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-NoProfile -ExecutionPolicy ByPass -NonInteractive -WindowStyle Hidden -File "C:\IntuneScripts\winrar-update.ps1"'
-$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable
-$principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-$splat = @{
-    TaskName = 'Update WinRAR Daily'
-    Trigger = $trigger
-    Action = $action
-    Settings = $settings
-    Principal = $principal
-    TaskPath = '\IntuneTasks\'
+# If the installed version is older than the latest version. 
+# Download the latest installer then starting update process.
+if ($installedVersion -lt $latestVersion) {
+
+    $process = Get-Process -ProcessName 'WinRAR' -ErrorAction SilentlyContinue
+    if ($process) {
+        Stop-Process -ProcessName 'WinRAR' -Force
+    }
+
+    Start-Process -FilePath ".\setup.exe" -ArgumentList '-s1' -Wait
 }
-Register-ScheduledTask @splat
