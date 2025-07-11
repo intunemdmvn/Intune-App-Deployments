@@ -17,7 +17,7 @@ foreach ($regPath in $regPaths) {
 $latestVersion = '7.12.0'
 
 # If the installed version is older than the latest version. 
-# Download the latest installer then starting update process.
+# Stop WinRAR if it running then install the update
 if ($installedVersion -lt $latestVersion) {
 
     $process = Get-Process -ProcessName 'WinRAR' -ErrorAction SilentlyContinue
