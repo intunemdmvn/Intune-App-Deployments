@@ -1,4 +1,11 @@
-# $trigger = New-ScheduledTaskTrigger -Weekly -At 3AM -DaysOfWeek Monday -WeeksInterval 1
+$path = 'C:\IntuneScript'
+if (-not (Test-Path -Path 'C:\IntuneScript')) {
+    New-Item -Path $path -ItemType Directory
+}
+
+Copy-Item -Path .\winrar-update.ps1 -Destination "C:\IntuneScript\"
+
+# $trigger = New-ScheduledTaskTrigger -Weekly -At 3AM -DaysOfWeek Sunday -WeeksInterval 1
 $trigger = New-ScheduledTaskTrigger -Daily -At 12AM
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-NoProfile -ExecutionPolicy ByPass -NonInteractive -WindowStyle Hidden -File "C:\IntuneScripts\winrar-update.ps1"'
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable
