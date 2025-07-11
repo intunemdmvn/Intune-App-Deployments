@@ -1,0 +1,1 @@
+Unregister-ScheduledTask -TaskName 'Update WinRAR Daily' -Confirm:$false
